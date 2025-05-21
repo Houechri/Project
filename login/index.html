@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Login / Signup</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-img">
+  <!-- Formulaire de Connexion -->
+  <div class="content" id="loginForm">
+    <header>Login Form</header>
+    <form id="loginFormElement">
+      <div class="field">
+        <input type="email" id="loginEmail" required placeholder="Email">
+      </div>
+      <div class="field space">
+        <input type="password" id="loginPassword" class="pass-key" required placeholder="Password">
+        <span class="show" id="toggleLoginPass">SHOW</span>
+      </div>
+      <div class="pass"><a href="#">Forgot Password?</a></div>
+      <div class="field">
+        <input type="submit" value="LOGIN">
+      </div>
+    </form>
+    <div class="login">Or login with</div>
+    <div class="links">
+      <div class="facebook"><span>Facebook</span></div>
+      <div class="instagram"><span>Instagram</span></div>
+    </div>
+    <div class="signup">Don't have an account? <a id="showSignup">Signup Now</a></div>
+  </div>
+
+ 
+  <div class="content" id="signupForm" style="display: none;">
+    <header>Signup Form</header>
+    <form id="signupFormElement">
+      <div class="field space">
+        <input type="text" id="firstName" required placeholder="First Name">
+      </div>
+      <div class="field space">
+        <input type="text" id="lastName" required placeholder="Last Name">
+      </div>
+      <div class="field space">
+        <input type="email" id="signupEmail" required placeholder="Email">
+      </div>
+      <div class="field space">
+        <input type="password" id="signupPassword" class="pass-key" required placeholder="Password">
+        <span class="show" id="toggleSignupPass">SHOW</span>
+      </div>
+      <div class="field space">
+        <input type="password" id="confirmPassword" required placeholder="Confirm Password">
+        <span class="show" id="toggleConfirmPass">SHOW</span>
+      </div>
+      <div class="field space">
+        <input type="submit" value="SIGN UP">
+      </div>
+    </form>
+    <div class="signup">Already have an account? <a id="showLogin">Login Now</a></div>
+  </div>
+</div>
+
+
+<script>
+ 
+  document.getElementById("showSignup").onclick = function () {
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("signupForm").style.display = "block";
+  };
+  document.getElementById("showLogin").onclick = function () {
+    document.getElementById("signupForm").style.display = "none";
+    document.getElementById("loginForm").style.display = "block";
+  };
+
+
+  document.getElementById("toggleLoginPass").onclick = function () {
+    const input = document.getElementById("loginPassword");
+    input.type = input.type === "password" ? "text" : "password";
+    this.textContent = input.type === "text" ? "HIDE" : "SHOW";
+  };
+
+  document.getElementById("toggleSignupPass").onclick = function () {
+    const input = document.getElementById("signupPassword");
+    input.type = input.type === "password" ? "text" : "password";
+    this.textContent = input.type === "text" ? "HIDE" : "SHOW";
+  };
+
+  document.getElementById("toggleConfirmPass").onclick = function () {
+    const input = document.getElementById("confirmPassword");
+    input.type = input.type === "password" ? "text" : "password";
+    this.textContent = input.type === "text" ? "HIDE" : "SHOW";
+  };
+
+  document.getElementById("loginFormElement").onsubmit = function (e) {
+    e.preventDefault();
+
+    const data = {
+      email: document.getElementById("loginEmail").value,
+      password: document.getElementById("loginPassword").value
+    };
+
+    fetch("login.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.user) {
+        alert("Bienvenue " + res.user.first_name);
+        // window.location.href = "dashboard.html"; // redirection possible
+      } else {
+        alert(res.message);
+      }
+    });
+  };
+
+  document.getElementById("signupFormElement").onsubmit = function (e) {
+    e.preventDefault();
+
+    const password = document.getElementById("signupPassword").value;
+    const confirm = document.getElementById("confirmPassword").value;
+
+    if (password !== confirm) {
+      alert("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    const data = {
+      first_name: document.getElementById("firstName").value,
+      last_name: document.getElementById("lastName").value,
+      email: document.getElementById("signupEmail").value,
+      password: password
+    };
+
+    fetch("signup.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+      alert(res.message);
+      if (res.message.includes("réussie")) {
+        document.getElementById("showLogin").click(); // revenir au login
+      }
+    });
+  };
+</script>
+
+</body>
+</html>
