@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Showcase</title>
+  <link rel="stylesheet" href="xx.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Available Products</h2>
+    <div class="product-container" id="product-container"></div>
+    <div style="text-align: center; margin-top: 20px;">
+      <button onclick="goToCart()" class="commander-button">Commander les produits</button>
+    </div>
+  </div>
+
+  <script>
+    const defaultProducts = [
+      { name: "Default Product 1", price: "19.99", image: "images/men1.jpg" },
+      { name: "Default Product 2", price: "29.99", image: "images/men2.jpg" },
+      { name: "Default Product 3", price: "9.99", image: "images/women.jpg" }
+    ];
+
+    function loadProducts() {
+      const savedProducts = JSON.parse(localStorage.getItem("products") || "[]");
+      return [...defaultProducts, ...savedProducts];
+    }
+
+    function renderProduct(product) {
+      const productItem = document.createElement("div");
+      productItem.classList.add("product-item");
+
+      const imgElement = document.createElement("img");
+      imgElement.src = product.image;
+      imgElement.alt = product.name;
+
+      const productInfo = document.createElement("div");
+      productInfo.classList.add("product-info");
+      productInfo.innerHTML = `
+        <span>Name: ${product.name}</span><br>
+        <span>Price: $${product.price}</span>
+      `;
+
+      const addToCartButton = document.createElement("button");
+      addToCartButton.textContent = "Add to Cart";
+      addToCartButton.className = "add-button";
+      addToCartButton.onclick = () => addToCart(product);
+
+      productItem.appendChild(imgElement);
+      productItem.appendChild(productInfo);
+      productItem.appendChild(addToCartButton);
+
+      document.getElementById("product-container").appendChild(productItem);
+    }
+
+    function addToCart(product) {
+      let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      cart.push(product);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert(`${product.name} ajouté au panier !`);
+    }
+
+    function goToCart() {
+      window.location.href = "cart.html";
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const products = loadProducts();
+      products.forEach(renderProduct);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="adminproduct.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="sidebar">
+        <div class="logo">
+          <h1>Admin<span>Panel</span></h1>
+        </div>
+        <div class="nav-menu">
+          <div class="menu-heading">Main</div>
+          <div class="nav-item"><i class="fas fa-chart-pie"></i><span>Dashboard</span></div>
+          <div class="nav-item"><i class="fas fa-users"></i><span>Users</span></div>
+          <div class="nav-item active"><i class="fas fa-box"></i><span>Products</span></div>
+          <div class="nav-item"><i class="fas fa-shopping-cart"></i><span>Orders</span></div>
+
+          <div class="menu-heading">Reports</div>
+          <div class="nav-item"><i class="fas fa-chart-line"></i><span>Analytics</span></div>
+          <div class="nav-item"><i class="fas fa-coins"></i><span>Sales</span></div>
+
+          <div class="menu-heading">Admin</div>
+          <div class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></div>
+          <div class="nav-item"><i class="fas fa-bell"></i><span>Notifications</span></div>
+          <div class="nav-item"><i class="fas fa-shield-alt"></i><span>Security</span></div>
+        </div>
+      </div>
+
+      <div class="header">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search..." />
+        </div>
+        <div class="header-actions">
+          <div class="notification">
+            <i class="fas fa-bell"></i>
+            <div class="badge">3</div>
+          </div>
+          <div class="notification">
+            <i class="fas fa-envelope"></i>
+            <div class="badge">5</div>
+          </div>
+          <div class="user-profile">
+            <div class="profile-img">JD</div>
+            <div class="user-info">
+              <div class="user-name">John Doe</div>
+              <div class="user-role">Administrator</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="page-title">
+          <div class="title">Dashboard</div>
+          <div class="action-buttons">
+            <button class="btn btn-outline">
+              <i class="fas fa-download"></i> Export
+            </button>
+            <button class="btn btn-primary" id="add-new-btn">
+              <i class="fas fa-plus"></i> Add New
+            </button>
+          </div>
+        </div>
+
+        <!-- Formulaire d'ajout de produit -->
+        <div id="add-product-form" style="display: none;">
+          <h2>Add New Product</h2>
+          <form id="product-form">
+            <label for="product-name">Product Name:</label>
+            <input type="text" id="product-name" name="product-name" required />
+
+            <label for="product-price">Product Price:</label>
+            <input type="number" id="product-price" name="product-price" required />
+
+            <label for="product-image">Product Image:</label>
+            <input type="file" id="product-image" name="product-image" accept="image/*" required />
+
+            <button type="submit" class="btn btn-primary">Add Product</button>
+          </form>
+        </div>
+
+        <div id="product-list">
+          <h2>Product List</h2>
+          <div class="product-container" id="product-container">
+            <!-- Products will be dynamically inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const defaultProducts = [
+        { name: "Default Product 1", price: "19.99", image: "images/men1.jpg" },
+        { name: "Default Product 2", price: "29.99", image: "images/men2.jpg" },
+        { name: "Default Product 3", price: "9.99", image: "images/women.jpg" }
+      ];
+
+      function loadProductsFromLocalStorage() {
+        const saved = JSON.parse(localStorage.getItem("products") || "[]");
+        return [...defaultProducts, ...saved];
+      }
+
+      function saveProduct(product) {
+        const saved = JSON.parse(localStorage.getItem("products") || "[]");
+        saved.push(product);
+        localStorage.setItem("products", JSON.stringify(saved));
+      }
+
+      function removeProduct(name) {
+        const products = JSON.parse(localStorage.getItem("products") || "[]");
+        const updated = products.filter(p => p.name !== name);
+        localStorage.setItem("products", JSON.stringify(updated));
+      }
+
+      function renderProduct(product) {
+        const productItem = document.createElement("div");
+        productItem.classList.add("product-item");
+
+        const imgElement = document.createElement("img");
+        imgElement.src = product.image;
+        productItem.appendChild(imgElement);
+
+        const productInfo = document.createElement("div");
+        productInfo.classList.add("product-info");
+        productInfo.innerHTML = `
+          <span>Name: ${product.name}</span>
+          <span>Price: $${product.price}</span>
+        `;
+        productItem.appendChild(productInfo);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.classList.add("delete-btn");
+        deleteBtn.addEventListener("click", () => {
+          productItem.remove();
+          removeProduct(product.name);
+        });
+        productItem.appendChild(deleteBtn);
+
+        document.getElementById("product-container").appendChild(productItem);
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const products = loadProductsFromLocalStorage();
+        products.forEach(renderProduct);
+      });
+
+      document.getElementById("add-new-btn").addEventListener("click", () => {
+        document.getElementById("add-product-form").style.display = "block";
+      });
+
+      document.getElementById("product-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const productName = document.getElementById("product-name").value;
+        const productPrice = document.getElementById("product-price").value;
+        const productImage = document.getElementById("product-image").files[0];
+        const imageUrl = URL.createObjectURL(productImage);
+
+        const newProduct = { name: productName, price: productPrice, image: imageUrl };
+        saveProduct(newProduct);
+        renderProduct(newProduct);
+
+        document.getElementById("product-form").reset();
+        document.getElementById("add-product-form").style.display = "none";
+      });
+    </script>
+  </body>
+</html>

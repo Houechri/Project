@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Liste des Commandes</title>
+  
+  <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="order.css" />
+  </head>
+</head>
+<body>
+     <div class="container">
+      
+      <div class="sidebar">
+        <div class="logo">
+          <h1>Admin<span>Panel</span></h1>
+        </div>
+        <div class="nav-menu">
+          <div class="menu-heading">Main</div>
+          <div class="nav-item ">
+            <i class="fas fa-chart-pie"></i>
+            <span>Dashboard</span>
+          </div>
+          <div class="nav-item">
+            <i class="fas fa-users"></i>
+            <span><a href="adminuser.html"style="text-decoration: none; color: white;">Users</a></span>
+          </div>
+          <div class="nav-item">
+            <i class="fas fa-box"></i>
+            <span> <a href="adminproduct.html" style="text-decoration: none; color: white;">Products</a></span>
+          </div>
+          <div class="nav-item active">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Orders</span>
+          </div>
+
+          <div class="menu-heading">Reports</div>
+          <div class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+          </div>
+          <div class="nav-item">
+            <i class="fas fa-coins"></i>
+            <span>Sales</span>
+          </div>
+
+          <div class="menu-heading">Admin</div>
+          <div class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </div>
+          <div class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+          </div>
+          <div class="nav-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>Security</span>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="header">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search..." />
+        </div>
+        <div class="header-actions">
+          <div class="notification">
+            <i class="fas fa-bell"></i>
+            <div class="badge">3</div>
+          </div>
+          <div class="notification">
+            <i class="fas fa-envelope"></i>
+            <div class="badge">5</div>
+          </div>
+          <div class="user-profile">
+            <div class="profile-img">JD</div>
+            <div class="user-info">
+              <div class="user-name">John Doe</div>
+              <div class="user-role">Administrator</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+   
+      <div class="main-content">
+        <div class="page-title">
+          <div class="title">Dashboard</div>
+          <div class="action-buttons">
+            <button class="btn btn-outline">
+              <i class="fas fa-download"></i>
+              Export
+            </button>
+            <button class="btn btn-primary">
+              <i class="fas fa-plus"></i>
+              Add New
+            </button>
+          </div>
+        </div>
+  <h1>Liste des Commandes</h1>
+  <div id="commandes"></div>
+
+  <script>
+    fetch('get_orders.php')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById("commandes");
+
+        if (data.error) {
+          container.innerHTML = `<p style="color:red;">Erreur : ${data.error}</p>`;
+          return;
+        }
+
+        data.forEach(cmd => {
+          const div = document.createElement("div");
+          div.className = "commande";
+          div.innerHTML = `
+            <h3>${cmd.nom}</h3>
+            <p><strong>Téléphone:</strong> ${cmd.telephone || "Non fourni"}</p>
+            <p><strong>Adresse:</strong> ${cmd.adresse}</p>
+            <p><strong>Total:</strong> $${cmd.total}</p>
+            <p><strong>Date:</strong> ${cmd.date}</p>
+            <h4>Produits:</h4>
+            ${cmd.produits.length > 0 ? cmd.produits.map(p => `
+              <div class="produit">
+                <p><strong>Nom:</strong> ${p.nom_produit}</p>
+                <p><strong>Prix:</strong> $${p.prix}</p>
+                ${p.image ? `<img src="${p.image}" alt="image produit" />` : ''}
+              </div>
+            `).join("") : "<p>Aucun produit</p>"}
+          `;
+          container.appendChild(div);
+        });
+      })
+      .catch(err => {
+        document.getElementById("commandes").innerHTML = `<p style="color:red;">Erreur de chargement : ${err}</p>`;
+      });
+  </script>
+</body>
+</html>
